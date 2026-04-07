@@ -17,7 +17,9 @@ export default function SubmissionForm() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        message_text: messageText.trim(),
+        message_text: linkUrl.trim()
+          ? `${messageText.trim()}\n\n${linkUrl.trim()}`
+          : messageText.trim(),
         submitted_by: submittedBy.trim() || null,
       }),
     });

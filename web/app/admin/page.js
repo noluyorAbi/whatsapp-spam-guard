@@ -186,7 +186,7 @@ export default function AdminPage() {
 
           {(activeTab === 'overview' || activeTab === 'submissions') && (
             <div className={activeTab === 'overview' ? 'mt-6' : ''}>
-              <SubmissionList onAddRule={(sub) => setExtractSub(sub)} />
+              <SubmissionList onAddRule={(sub) => setExtractSub(sub)} refreshKey={refreshKey} />
             </div>
           )}
 

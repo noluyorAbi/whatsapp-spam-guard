@@ -8,7 +8,7 @@ const PRIORITY_MAP = {
   dismissed: { label: 'Low Priority', color: 'bg-tertiary/10 text-tertiary' },
 };
 
-export default function SubmissionList({ onAddRule }) {
+export default function SubmissionList({ onAddRule, refreshKey }) {
   const [submissions, setSubmissions] = useState([]);
   const [filter, setFilter] = useState('pending');
   const [expandedId, setExpandedId] = useState(null);
@@ -23,7 +23,7 @@ export default function SubmissionList({ onAddRule }) {
 
   useEffect(() => {
     fetchSubmissions();
-  }, [filter]);
+  }, [filter, refreshKey]);
 
   async function dismiss(id) {
     await fetch('/api/submissions', {

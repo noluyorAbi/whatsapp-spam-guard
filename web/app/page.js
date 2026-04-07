@@ -15,8 +15,8 @@ export default function Home() {
         </div>
         <div className="flex items-center gap-6">
           <a href="/admin" className="text-on-surface-variant hover:text-on-surface text-sm transition-colors">Dashboard</a>
-          <a href="#" className="text-on-surface-variant hover:text-on-surface text-sm transition-colors">Reports</a>
-          <a href="#" className="text-on-surface-variant hover:text-on-surface text-sm transition-colors">Rules</a>
+          <a href="/admin" className="text-on-surface-variant hover:text-on-surface text-sm transition-colors">Reports</a>
+          <a href="/admin" className="text-on-surface-variant hover:text-on-surface text-sm transition-colors">Rules</a>
         </div>
       </nav>
 

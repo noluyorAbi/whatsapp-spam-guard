@@ -63,13 +63,13 @@ export default function StatusCard() {
     {
       icon: 'person_remove',
       label: 'Senders Kicked',
-      value: status.senders_kicked ?? 0,
+      value: status.spam_blocked ?? 0,
       accent: 'bg-secondary',
     },
     {
-      icon: 'psychology',
-      label: 'AI Classifications',
-      value: status.ai_classifications ?? 0,
+      icon: 'schedule',
+      label: 'Last Heartbeat',
+      value: `${secondsAgo}s`,
       accent: 'bg-primary',
     },
   ];

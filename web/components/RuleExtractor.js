@@ -205,16 +205,12 @@ export default function RuleExtractor({ submission, onClose, onDone }) {
           </div>
         )}
 
-        {/* Action dropdown */}
-        <div className="mb-8">
-          <label className="sentinel-label block mb-3">Action</label>
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-on-surface-variant text-xl">gavel</span>
-            <select className="stealth-input appearance-none cursor-pointer">
-              <option value="block">Block Message</option>
-              <option value="warn">Warn Sender</option>
-              <option value="flag">Flag for Review</option>
-            </select>
+        {/* Action info */}
+        <div className="mb-8 flex items-center gap-3 p-4 bg-surface-container-high rounded-xl">
+          <span className="material-symbols-outlined text-primary text-xl">gavel</span>
+          <div>
+            <p className="text-on-surface text-sm font-medium">Action: Delete &amp; Kick</p>
+            <p className="text-on-surface-variant text-xs">Matching messages will be deleted and the sender removed from the group</p>
           </div>
         </div>
 
