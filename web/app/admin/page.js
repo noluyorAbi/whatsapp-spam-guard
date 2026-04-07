@@ -27,6 +27,7 @@ export default function AdminPage() {
   const [extractSub, setExtractSub] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [activeTab, setActiveTab] = useState('overview');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   async function handleLogin(e) {
     e.preventDefault();
@@ -48,7 +49,7 @@ export default function AdminPage() {
   if (!authed) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-        <div className="glow-blob w-[500px] h-[500px] bg-primary top-[-200px] right-[-100px] fixed" />
+        <div className="glow-blob w-[500px] h-[500px] bg-primary top-[-200px] right-[-100px] absolute" />
 
         <div className="w-full max-w-sm">
           <div className="flex items-center justify-center gap-2 mb-2">
@@ -88,10 +89,23 @@ export default function AdminPage() {
     );
   }
 
+  function handleNavClick(key) {
+    setActiveTab(key);
+    setSidebarOpen(false);
+  }
+
   return (
     <div className="min-h-screen flex">
+      {/* Mobile sidebar backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-20 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-surface-container-low flex flex-col min-h-screen shrink-0">
+      <aside className={`${sidebarOpen ? 'flex fixed inset-y-0 left-0 z-30' : 'hidden'} md:flex md:relative md:z-auto w-64 bg-surface-container-low flex-col min-h-screen shrink-0`}>
         {/* Logo */}
         <div className="px-5 pt-6 pb-4">
           <div className="flex items-center gap-2 mb-1">
@@ -108,7 +122,7 @@ export default function AdminPage() {
           {NAV_ITEMS.map((item) => (
             <button
               key={item.key}
-              onClick={() => setActiveTab(item.key)}
+              onClick={() => handleNavClick(item.key)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 activeTab === item.key
                   ? 'bg-primary/10 text-primary'
@@ -146,10 +160,18 @@ export default function AdminPage() {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
         {/* Top bar */}
-        <header className="flex items-center justify-between px-6 py-4 bg-surface-container-low/50">
-          <div className="flex items-center gap-6">
-            <h1 className="font-headline font-semibold text-on-surface text-lg">WhatsApp Spam Guard</h1>
-            <div className="flex items-center gap-1">
+        <header className="flex items-center justify-between px-4 md:px-6 py-4 bg-surface-container-low/50">
+          <div className="flex items-center gap-3 md:gap-6">
+            {/* Hamburger — mobile only */}
+            <button
+              className="md:hidden p-2 text-on-surface-variant hover:text-on-surface rounded-lg hover:bg-surface-container transition-all"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Open menu"
+            >
+              <span className="material-symbols-outlined text-xl">menu</span>
+            </button>
+            <h1 className="font-headline font-semibold text-on-surface text-base md:text-lg">WhatsApp Spam Guard</h1>
+            <div className="hidden sm:flex items-center gap-1">
               {TOP_TABS.map((tab) => (
                 <button
                   key={tab.key}

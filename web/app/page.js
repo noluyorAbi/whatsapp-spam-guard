@@ -4,8 +4,8 @@ export default function Home() {
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Background glow accents */}
-      <div className="glow-blob w-[600px] h-[600px] bg-primary top-[-200px] left-[-100px] fixed" />
-      <div className="glow-blob w-[400px] h-[400px] bg-secondary bottom-[-150px] right-[-100px] fixed" />
+      <div className="glow-blob w-[600px] h-[600px] bg-primary top-[-200px] left-[-100px] absolute" />
+      <div className="glow-blob w-[400px] h-[400px] bg-secondary bottom-[-150px] right-[-100px] absolute" />
 
       {/* Navbar */}
       <nav className="relative z-10 flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">

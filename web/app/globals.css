@@ -18,9 +18,9 @@
   --color-danger: #ff6b6b;
 
   /* Fonts */
-  --font-headline: 'Space Grotesk', sans-serif;
-  --font-body: 'Inter', sans-serif;
-  --font-data: 'JetBrains Mono', monospace;
+  --font-headline: var(--font-space-grotesk), sans-serif;
+  --font-body: var(--font-inter), sans-serif;
+  --font-data: var(--font-jetbrains-mono), monospace;
 }
 
 /* Reset */
@@ -134,6 +134,7 @@ body {
   filter: blur(120px);
   pointer-events: none;
   opacity: 0.15;
+  z-index: 0;
 }
 
 /* Scrollbar */
