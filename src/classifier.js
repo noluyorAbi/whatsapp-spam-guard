@@ -1,5 +1,6 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const OpenAI = require('openai');
+const log = require('./logger');
 
 const PROMPT = `You are a spam detection system for university WhatsApp groups. Analyze the following message and determine if it is spam related to: trading, forex, cryptocurrency scams, adult/erotic content, gambling, betting, or similar promotional/scam groups.
 
@@ -33,21 +34,21 @@ async function classifyWithOpenAI(apiKey, message) {
 }
 
 async function classify(config, message) {
-  // Try Gemini first
   try {
     return await classifyWithGemini(config.geminiApiKey, message);
   } catch (err) {
-    console.warn('[classifier] Gemini failed, falling back to OpenAI:', err.message);
+    log.aiGeminiFailed(err.message);
   }
 
-  // Fallback to OpenAI
-  try {
-    return await classifyWithOpenAI(config.openaiApiKey, message);
-  } catch (err) {
-    console.error('[classifier] OpenAI also failed:', err.message);
+  if (config.openaiApiKey) {
+    try {
+      return await classifyWithOpenAI(config.openaiApiKey, message);
+    } catch (err) {
+      // OpenAI also failed
+    }
   }
 
-  // Both failed — fail open
+  log.aiBothFailed();
   return { spam: false, reason: 'Classification failed — both APIs unavailable' };
 }
 

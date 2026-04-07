@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 
 export default function StatusCard() {
   const [status, setStatus] = useState(null);
@@ -15,7 +16,7 @@ export default function StatusCard() {
 
   useEffect(() => {
     fetchStatus();
-    const interval = setInterval(fetchStatus, 10000);
+    const interval = setInterval(fetchStatus, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -26,7 +27,7 @@ export default function StatusCard() {
   if (!status) {
     return (
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-        <p className="text-gray-500">No bot status data available.</p>
+        <p className="text-gray-500">No bot status data available. Start the bot to see status.</p>
       </div>
     );
   }
@@ -34,6 +35,34 @@ export default function StatusCard() {
   const lastUpdate = new Date(status.updated_at);
   const secondsAgo = Math.floor((Date.now() - lastUpdate.getTime()) / 1000);
   const isConnected = status.status === 'connected' && secondsAgo < 90;
+  const isWaitingForQr = status.status === 'waiting_for_qr' && status.qr_code && secondsAgo < 120;
+
+  // QR code view
+  if (isWaitingForQr) {
+    return (
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-white">Bot Status</h2>
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-yellow-900/50 text-yellow-400 border border-yellow-800">
+            <span className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+            Waiting for QR Scan
+          </span>
+        </div>
+
+        <div className="flex flex-col items-center gap-4 py-4">
+          <p className="text-gray-400 text-sm text-center">
+            Scan this QR code with WhatsApp to connect the bot
+          </p>
+          <div className="bg-white p-4 rounded-xl">
+            <QRCodeSVG value={status.qr_code} size={256} />
+          </div>
+          <p className="text-gray-600 text-xs">
+            Open WhatsApp → Settings → Linked Devices → Link a Device
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">

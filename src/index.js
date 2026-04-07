@@ -13,6 +13,8 @@ const {
   startHeartbeat,
   stopHeartbeat,
   sendHeartbeat,
+  sendQrCode,
+  clearQrCode,
   startPolling,
   stopPolling,
   incrementProcessed,
@@ -40,11 +42,13 @@ log.connecting();
 client.on('qr', (qr) => {
   log.qr();
   qrcode.generate(qr, { small: true });
+  sendQrCode(qr);
 });
 
 client.on('ready', () => {
   botId = client.info.wid._serialized;
   log.ready(botId);
+  clearQrCode();
   startHeartbeat();
   startPolling();
 });

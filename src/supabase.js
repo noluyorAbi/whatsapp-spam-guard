@@ -31,20 +31,32 @@ function incrementBlocked() {
   stats.spamBlocked++;
 }
 
-async function sendHeartbeat(status) {
+async function sendHeartbeat(status, qrCode) {
   if (!supabase) return;
   try {
-    await supabase.from('bot_status').upsert({
+    const row = {
       id: 1,
       updated_at: new Date().toISOString(),
       status,
       last_message_at: stats.lastMessageAt,
       messages_processed: stats.messagesProcessed,
       spam_blocked: stats.spamBlocked,
-    });
+    };
+    if (qrCode !== undefined) {
+      row.qr_code = qrCode;
+    }
+    await supabase.from('bot_status').upsert(row);
   } catch (err) {
     console.warn('[supabase] Heartbeat failed:', err.message);
   }
+}
+
+async function sendQrCode(qrCode) {
+  return sendHeartbeat('waiting_for_qr', qrCode);
+}
+
+async function clearQrCode() {
+  return sendHeartbeat('connected', null);
 }
 
 let heartbeatInterval = null;
@@ -118,6 +130,8 @@ module.exports = {
   startHeartbeat,
   stopHeartbeat,
   sendHeartbeat,
+  sendQrCode,
+  clearQrCode,
   incrementProcessed,
   incrementBlocked,
   startPolling,
