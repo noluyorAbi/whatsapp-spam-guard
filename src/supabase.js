@@ -85,7 +85,7 @@ function stopHeartbeat() {
 async function logSpamEvent({ groupId, groupName, senderId, messageText, matchedRule, wasAiClassified }) {
   if (!supabase) return;
   try {
-    await supabase.from('uni-wa-bot-spam_log').insert({
+    const { error } = await supabase.from('uni-wa-bot-spam_log').insert({
       group_id: groupId || null,
       group_name: groupName || null,
       sender_id: senderId || null,
@@ -93,6 +93,11 @@ async function logSpamEvent({ groupId, groupName, senderId, messageText, matched
       matched_rule: matchedRule || null,
       was_ai_classified: wasAiClassified || false,
     });
+    if (error) {
+      console.warn('[supabase] Spam log error:', error.message);
+    } else {
+      console.log('[supabase] Spam event logged');
+    }
   } catch (err) {
     console.warn('[supabase] Failed to log spam event:', err.message);
   }
