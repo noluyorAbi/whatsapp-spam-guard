@@ -457,8 +457,16 @@ uni-whatsapp-bot/
 
 ---
 
+## ⚠️ Disclaimer
+
+This is an **independent open-source project** and is **not affiliated with, endorsed by, or connected to any company, corporation, or organization** — including but not limited to BMW Group, Meta/WhatsApp, Google, or OpenAI. "University" refers to the general academic context in which this tool is used. This project uses unofficial WhatsApp Web APIs and is intended for educational and community moderation purposes only. Use at your own risk and in accordance with WhatsApp's Terms of Service.
+
+---
+
 <div align="center">
 
 **Built for university communities** · Keeps groups clean · Open source
+
+Made with ❤️ by [Alperen Adatepe](https://github.com/noluyorAbi)
 
 </div>

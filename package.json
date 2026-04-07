@@ -1,12 +1,21 @@
 {
-  "name": "uni-whatsapp-bot",
+  "name": "whatsapp-spam-guard",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Autonomous spam detection bot for university WhatsApp groups. Detects trading, adult, gambling, and academic fraud spam using a hybrid rule engine + AI classifier (Gemini/OpenAI). Includes a Next.js admin panel with crowd-sourced spam reporting.",
+  "main": "src/index.js",
   "directories": {
     "doc": "docs"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noluyorAbi/whatsapp-spam-guard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/noluyorAbi/whatsapp-spam-guard/issues"
+  },
+  "homepage": "https://github.com/noluyorAbi/whatsapp-spam-guard#readme",
   "scripts": {
+    "dev": "concurrently --names bot,web --prefix-colors cyan,magenta \"node src/index.js\" \"cd web && npm run dev\"",
     "start": "node src/index.js",
     "start:bg": "pm2 start ecosystem.config.js",
     "stop": "pm2 stop whatsapp-spam-guard",
@@ -14,8 +23,19 @@
     "logs": "pm2 logs whatsapp-spam-guard",
     "test": "jest"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "whatsapp",
+    "spam-detection",
+    "chatbot",
+    "moderation",
+    "university",
+    "whatsapp-bot",
+    "anti-spam",
+    "gemini-ai",
+    "supabase",
+    "nextjs"
+  ],
+  "author": "Alperen Adatepe",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
@@ -29,6 +49,7 @@
     "whatsapp-web.js": "^1.34.6"
   },
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "jest": "^30.3.0"
   }
 }

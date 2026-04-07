@@ -39,10 +39,11 @@ describe('loadConfig', () => {
     expect(() => loadConfig()).toThrow('GEMINI_API_KEY');
   });
 
-  test('throws when OPENAI_API_KEY is missing', () => {
+  test('returns null openaiApiKey when OPENAI_API_KEY is missing', () => {
     process.env.GEMINI_API_KEY = 'test-gemini-key';
     delete process.env.OPENAI_API_KEY;
 
-    expect(() => loadConfig()).toThrow('OPENAI_API_KEY');
+    const config = loadConfig();
+    expect(config.openaiApiKey).toBeNull();
   });
 });
