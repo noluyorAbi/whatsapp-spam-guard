@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 
-export default function StatusCard() {
+export default function StatusCard({ onNavigate }) {
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -53,24 +53,30 @@ export default function StatusCard() {
       label: 'Messages Scanned',
       value: status.messages_processed ?? 0,
       accent: 'bg-primary',
+      clickable: false,
     },
     {
       icon: 'block',
       label: 'Spam Blocked',
       value: status.spam_blocked ?? 0,
       accent: 'bg-tertiary',
+      clickable: true,
+      tab: 'stats',
     },
     {
       icon: 'person_remove',
       label: 'Senders Kicked',
       value: status.spam_blocked ?? 0,
       accent: 'bg-secondary',
+      clickable: true,
+      tab: 'stats',
     },
     {
       icon: 'schedule',
       label: 'Last Heartbeat',
       value: `${secondsAgo}s`,
       accent: 'bg-primary',
+      clickable: false,
     },
   ];
 
@@ -202,15 +208,29 @@ export default function StatusCard() {
       {/* Quick stats row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {quickStats.map((stat) => (
-          <div key={stat.label} className="bg-surface-container rounded-2xl p-5 relative overflow-hidden">
+          <div
+            key={stat.label}
+            onClick={stat.clickable && onNavigate ? () => onNavigate(stat.tab) : undefined}
+            className={`bg-surface-container rounded-2xl p-5 relative overflow-hidden transition-all ${
+              stat.clickable ? 'cursor-pointer hover:bg-surface-container-high hover:scale-[1.02] group' : ''
+            }`}
+          >
             <div className={`absolute bottom-0 left-0 right-0 h-0.5 ${stat.accent}`} />
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center justify-between mb-3">
               <div className="w-9 h-9 rounded-xl bg-surface-container-high flex items-center justify-center">
                 <span className="material-symbols-outlined text-on-surface-variant text-xl">{stat.icon}</span>
               </div>
+              {stat.clickable && (
+                <span className="material-symbols-outlined text-on-surface-variant/30 text-lg group-hover:text-primary transition-colors">
+                  arrow_forward
+                </span>
+              )}
             </div>
             <p className="font-headline text-2xl font-bold text-on-surface mb-1">{stat.value}</p>
             <p className="sentinel-label">{stat.label}</p>
+            {stat.clickable && (
+              <p className="text-on-surface-variant/40 text-[10px] mt-1 group-hover:text-primary/60 transition-colors">Click to view details</p>
+            )}
           </div>
         ))}
       </div>

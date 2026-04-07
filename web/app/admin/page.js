@@ -204,7 +204,7 @@ export default function AdminPage() {
         {/* Content */}
         <main className="flex-1 overflow-y-auto p-6">
           {(activeTab === 'overview' || activeTab === 'stats') && (
-            <StatusCard />
+            <StatusCard onNavigate={(tab) => setActiveTab(tab)} />
           )}
 
           {(activeTab === 'overview' || activeTab === 'stats') && (
