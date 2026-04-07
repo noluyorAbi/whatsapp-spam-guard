@@ -8,6 +8,11 @@ export default function SubmissionForm() {
   const [linkUrl, setLinkUrl] = useState('');
   const [status, setStatus] = useState('idle');
 
+  function handleMessageChange(e) {
+    setMessageText(e.target.value);
+    if (status === 'error') setStatus('idle');
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     if (!messageText.trim()) return;
@@ -65,7 +70,7 @@ export default function SubmissionForm() {
           <textarea
             id="message"
             value={messageText}
-            onChange={(e) => setMessageText(e.target.value)}
+            onChange={handleMessageChange}
             rows={5}
             required
             placeholder="Paste the full spam message here..."
