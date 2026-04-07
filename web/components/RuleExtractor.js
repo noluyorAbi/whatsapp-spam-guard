@@ -5,6 +5,14 @@ import { extractDomains, extractKeywords } from '@/lib/extract-rules';
 
 const CATEGORIES = ['trading', 'adult', 'gambling', 'academic', 'other'];
 
+const CATEGORY_CHIPS = {
+  trading: 'bg-secondary/10 text-secondary',
+  adult: 'bg-danger/10 text-danger',
+  gambling: 'bg-tertiary/10 text-tertiary',
+  academic: 'bg-primary/10 text-primary',
+  other: 'bg-surface-container-highest text-on-surface-variant',
+};
+
 export default function RuleExtractor({ submission, onClose, onDone }) {
   const [domains, setDomains] = useState([]);
   const [keywords, setKeywords] = useState([]);
@@ -85,21 +93,31 @@ export default function RuleExtractor({ submission, onClose, onDone }) {
   const totalSelected = selectedDomains.size + selectedKeywords.size;
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
-      <div className="bg-gray-900 border border-gray-700 rounded-xl max-w-lg w-full max-h-[80vh] overflow-y-auto p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Extract Rules</h3>
+    <div className="fixed inset-0 bg-surface/70 backdrop-blur-xl flex items-center justify-center p-4 z-50">
+      <div className="bg-surface-container-low rounded-[2rem] max-w-lg w-full max-h-[80vh] overflow-y-auto p-8 shadow-2xl shadow-black/30">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <span className="material-symbols-outlined text-primary text-xl">shield</span>
+          </div>
+          <div>
+            <h3 className="font-headline text-xl font-bold text-on-surface">Extract New Security Rule</h3>
+            <p className="text-on-surface-variant text-xs">Define conditions from the reported message</p>
+          </div>
+        </div>
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-300 mb-2">Category</label>
+        {/* Rule Signature / Category */}
+        <div className="mb-6">
+          <label className="sentinel-label block mb-3">Rule Signature</label>
           <div className="flex flex-wrap gap-2">
             {CATEGORIES.map((c) => (
               <button
                 key={c}
                 onClick={() => setCategory(c)}
-                className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all ${
                   category === c
-                    ? 'bg-cyan-600 text-white'
-                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                    ? CATEGORY_CHIPS[c] + ' ring-1 ring-current'
+                    : 'bg-surface-container-high text-on-surface-variant hover:text-on-surface'
                 }`}
               >
                 {c}
@@ -108,46 +126,59 @@ export default function RuleExtractor({ submission, onClose, onDone }) {
           </div>
         </div>
 
+        {/* Conditions: Domains */}
         {domains.length > 0 && (
-          <div className="mb-4">
-            <p className="text-sm font-medium text-gray-300 mb-2">Domains found</p>
-            <div className="space-y-1">
+          <div className="mb-6">
+            <label className="sentinel-label block mb-3">Domain Conditions</label>
+            <div className="flex flex-wrap gap-2">
               {domains.map((d) => (
-                <label key={d} className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={selectedDomains.has(d)}
-                    onChange={() => toggleDomain(d)}
-                    className="rounded border-gray-600"
-                  />
+                <button
+                  key={d}
+                  onClick={() => toggleDomain(d)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-data transition-all ${
+                    selectedDomains.has(d)
+                      ? 'bg-secondary/10 text-secondary ring-1 ring-secondary/30'
+                      : 'bg-surface-container-high text-on-surface-variant'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-sm">
+                    {selectedDomains.has(d) ? 'check_circle' : 'circle'}
+                  </span>
                   {d}
-                </label>
+                </button>
               ))}
             </div>
           </div>
         )}
 
+        {/* Conditions: Keywords */}
         {keywords.length > 0 && (
-          <div className="mb-4">
-            <p className="text-sm font-medium text-gray-300 mb-2">Keywords found</p>
-            <div className="space-y-1">
+          <div className="mb-6">
+            <label className="sentinel-label block mb-3">Pattern Conditions</label>
+            <div className="flex flex-wrap gap-2">
               {keywords.map((k) => (
-                <label key={k} className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={selectedKeywords.has(k)}
-                    onChange={() => toggleKeyword(k)}
-                    className="rounded border-gray-600"
-                  />
+                <button
+                  key={k}
+                  onClick={() => toggleKeyword(k)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-data transition-all ${
+                    selectedKeywords.has(k)
+                      ? 'bg-primary/10 text-primary ring-1 ring-primary/30'
+                      : 'bg-surface-container-high text-on-surface-variant'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-sm">
+                    {selectedKeywords.has(k) ? 'check_circle' : 'circle'}
+                  </span>
                   {k}
-                </label>
+                </button>
               ))}
             </div>
           </div>
         )}
 
-        <div className="mb-4">
-          <p className="text-sm font-medium text-gray-300 mb-2">Add custom keyword</p>
+        {/* Add custom condition */}
+        <div className="mb-6">
+          <label className="sentinel-label block mb-3">Add Custom Condition</label>
           <div className="flex gap-2">
             <input
               type="text"
@@ -155,34 +186,54 @@ export default function RuleExtractor({ submission, onClose, onDone }) {
               onChange={(e) => setCustomKeyword(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCustomKeyword())}
               placeholder="e.g. exam help"
-              className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              className="stealth-input flex-1"
             />
             <button
               onClick={addCustomKeyword}
-              className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition-colors"
+              className="btn-ghost text-sm py-2 px-4 flex items-center gap-1.5 whitespace-nowrap"
             >
+              <span className="material-symbols-outlined text-lg">add</span>
               Add
             </button>
           </div>
         </div>
 
         {domains.length === 0 && keywords.length === 0 && (
-          <p className="text-gray-500 text-sm mb-4">No domains or keywords auto-detected. Add custom keywords above.</p>
+          <div className="text-center py-4 mb-4">
+            <span className="material-symbols-outlined text-3xl text-on-surface-variant/30 mb-2">search_off</span>
+            <p className="text-on-surface-variant text-sm">No domains or keywords auto-detected. Add custom conditions above.</p>
+          </div>
         )}
 
-        <div className="flex justify-end gap-2 pt-4 border-t border-gray-800">
+        {/* Action dropdown */}
+        <div className="mb-8">
+          <label className="sentinel-label block mb-3">Action</label>
+          <div className="flex items-center gap-3">
+            <span className="material-symbols-outlined text-on-surface-variant text-xl">gavel</span>
+            <select className="stealth-input appearance-none cursor-pointer">
+              <option value="block">Block Message</option>
+              <option value="warn">Warn Sender</option>
+              <option value="flag">Flag for Review</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Footer buttons */}
+        <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm font-medium rounded-lg transition-colors"
+            className="btn-ghost text-sm py-2.5 px-5 flex items-center gap-2"
           >
-            Cancel
+            <span className="material-symbols-outlined text-lg">close</span>
+            Discard
           </button>
           <button
             onClick={handleSave}
             disabled={saving || totalSelected === 0}
-            className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 disabled:bg-gray-700 disabled:text-gray-500 text-white text-sm font-medium rounded-lg transition-colors"
+            className="btn-primary text-sm py-2.5 px-5 flex items-center gap-2"
           >
-            {saving ? 'Saving...' : `Add ${totalSelected} Rule${totalSelected !== 1 ? 's' : ''}`}
+            <span className="material-symbols-outlined text-lg">publish</span>
+            {saving ? 'Publishing...' : `Publish Rule${totalSelected !== 1 ? 's' : ''} (${totalSelected})`}
           </button>
         </div>
       </div>

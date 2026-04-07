@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 
-const STATUS_COLORS = {
-  pending: 'bg-yellow-900/50 text-yellow-400 border-yellow-800',
-  approved: 'bg-green-900/50 text-green-400 border-green-800',
-  dismissed: 'bg-gray-800 text-gray-500 border-gray-700',
+const PRIORITY_MAP = {
+  pending: { label: 'Analysis Pending', color: 'bg-secondary/10 text-secondary' },
+  approved: { label: 'High Certainty', color: 'bg-primary/10 text-primary' },
+  dismissed: { label: 'Low Priority', color: 'bg-tertiary/10 text-tertiary' },
 };
 
 export default function SubmissionList({ onAddRule }) {
@@ -35,86 +35,126 @@ export default function SubmissionList({ onAddRule }) {
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-white">Submissions</h2>
-        <div className="flex gap-1">
-          {['pending', 'approved', 'dismissed', 'all'].map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
-                filter === f
-                  ? 'bg-cyan-600 text-white'
-                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-              }`}
-            >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
-            </button>
-          ))}
+    <div className="bg-surface-container rounded-2xl overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 py-5">
+        <div className="flex items-center gap-3">
+          <h2 className="font-headline text-lg font-semibold text-on-surface">Submissions</h2>
+          <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-bold font-data">
+            {submissions.length}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button className="p-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all">
+            <span className="material-symbols-outlined text-xl">filter_list</span>
+          </button>
+          <div className="flex gap-1 bg-surface-container-low rounded-lg p-1">
+            {['pending', 'approved', 'dismissed', 'all'].map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                  filter === f
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-on-surface-variant hover:text-on-surface'
+                }`}
+              >
+                {f.charAt(0).toUpperCase() + f.slice(1)}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {loading ? (
-        <div className="animate-pulse space-y-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-16 bg-gray-800 rounded-lg" />
-          ))}
-        </div>
-      ) : submissions.length === 0 ? (
-        <p className="text-gray-500 text-center py-8">No {filter === 'all' ? '' : filter} submissions.</p>
-      ) : (
-        <div className="space-y-2">
-          {submissions.map((sub) => (
-            <div key={sub.id} className="border border-gray-800 rounded-lg overflow-hidden">
-              <button
-                onClick={() => setExpandedId(expandedId === sub.id ? null : sub.id)}
-                className="w-full p-4 text-left hover:bg-gray-800/50 transition-colors"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-gray-300 text-sm truncate">
-                      {sub.message_text.substring(0, 100)}
-                    </p>
-                    <p className="text-gray-600 text-xs mt-1">
-                      {new Date(sub.created_at).toLocaleString()}
-                      {sub.submitted_by && ` · by ${sub.submitted_by}`}
-                    </p>
-                  </div>
-                  <span className={`ml-3 px-2 py-0.5 rounded text-xs font-medium border ${STATUS_COLORS[sub.status]}`}>
-                    {sub.status}
-                  </span>
-                </div>
-              </button>
+      {/* List */}
+      <div className="px-3 pb-3">
+        {loading ? (
+          <div className="space-y-2 p-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-20 bg-surface-container-high rounded-xl animate-pulse" />
+            ))}
+          </div>
+        ) : submissions.length === 0 ? (
+          <div className="text-center py-12">
+            <span className="material-symbols-outlined text-4xl text-on-surface-variant/30 mb-2">inbox</span>
+            <p className="text-on-surface-variant text-sm">No {filter === 'all' ? '' : filter} submissions.</p>
+          </div>
+        ) : (
+          <div className="space-y-1">
+            {submissions.map((sub) => {
+              const priority = PRIORITY_MAP[sub.status] || PRIORITY_MAP.pending;
+              const isActive = expandedId === sub.id;
 
-              {expandedId === sub.id && (
-                <div className="px-4 pb-4 border-t border-gray-800">
-                  <pre className="text-gray-300 text-sm whitespace-pre-wrap mt-3 p-3 bg-gray-800 rounded-lg max-h-64 overflow-y-auto">
-                    {sub.message_text}
-                  </pre>
+              return (
+                <div
+                  key={sub.id}
+                  className={`rounded-xl overflow-hidden transition-all duration-200 hover:translate-x-1 ${
+                    isActive
+                      ? 'bg-surface-container-high ring-1 ring-primary/20 border-l-2 border-l-primary'
+                      : 'hover:bg-surface-container-high/50'
+                  }`}
+                >
+                  <button
+                    onClick={() => setExpandedId(isActive ? null : sub.id)}
+                    className="w-full p-4 text-left"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${priority.color}`}>
+                            {priority.label}
+                          </span>
+                        </div>
+                        <p className="text-on-surface text-sm font-medium truncate mb-1">
+                          {sub.message_text.substring(0, 80)}
+                        </p>
+                        <p className="text-on-surface-variant text-xs">
+                          {new Date(sub.created_at).toLocaleString()}
+                          {sub.submitted_by && (
+                            <span className="ml-2 text-on-surface-variant/60">
+                              <span className="material-symbols-outlined text-xs align-middle">person</span> {sub.submitted_by}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                      <span className="material-symbols-outlined text-on-surface-variant text-lg mt-1">
+                        {isActive ? 'expand_less' : 'expand_more'}
+                      </span>
+                    </div>
+                  </button>
 
-                  {sub.status === 'pending' && (
-                    <div className="flex gap-2 mt-3">
-                      <button
-                        onClick={() => onAddRule(sub)}
-                        className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-medium rounded-lg transition-colors"
-                      >
-                        Add to Rules
-                      </button>
-                      <button
-                        onClick={() => dismiss(sub.id)}
-                        className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm font-medium rounded-lg transition-colors"
-                      >
-                        Dismiss
-                      </button>
+                  {isActive && (
+                    <div className="px-4 pb-4">
+                      <pre className="text-on-surface text-sm whitespace-pre-wrap p-4 bg-surface-container-low rounded-xl max-h-64 overflow-y-auto font-data text-xs leading-relaxed">
+                        {sub.message_text}
+                      </pre>
+
+                      {sub.status === 'pending' && (
+                        <div className="flex gap-2 mt-4">
+                          <button
+                            onClick={() => onAddRule(sub)}
+                            className="btn-primary text-sm py-2.5 px-5 flex items-center gap-2"
+                          >
+                            <span className="material-symbols-outlined text-lg">gavel</span>
+                            Add to Rules
+                          </button>
+                          <button
+                            onClick={() => dismiss(sub.id)}
+                            className="btn-ghost text-sm py-2.5 px-5 flex items-center gap-2"
+                          >
+                            <span className="material-symbols-outlined text-lg">close</span>
+                            Dismiss
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

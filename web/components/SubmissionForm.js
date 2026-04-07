@@ -5,6 +5,7 @@ import { useState } from 'react';
 export default function SubmissionForm() {
   const [messageText, setMessageText] = useState('');
   const [submittedBy, setSubmittedBy] = useState('');
+  const [linkUrl, setLinkUrl] = useState('');
   const [status, setStatus] = useState('idle');
 
   async function handleSubmit(e) {
@@ -27,54 +28,89 @@ export default function SubmissionForm() {
       setStatus('success');
       setMessageText('');
       setSubmittedBy('');
+      setLinkUrl('');
       setTimeout(() => setStatus('idle'), 3000);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Group Name */}
       <div>
-        <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-1">
-          Paste the spam message
+        <label htmlFor="submittedBy" className="sentinel-label block mb-3">
+          Group Name
         </label>
-        <textarea
-          id="message"
-          value={messageText}
-          onChange={(e) => setMessageText(e.target.value)}
-          rows={6}
-          required
-          placeholder="Paste the full spam message here..."
-          className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent resize-y"
-        />
+        <div className="flex items-center gap-3">
+          <span className="material-symbols-outlined text-on-surface-variant text-xl">group</span>
+          <input
+            id="submittedBy"
+            type="text"
+            value={submittedBy}
+            onChange={(e) => setSubmittedBy(e.target.value)}
+            placeholder="e.g. CS 101 Study Group"
+            className="stealth-input"
+          />
+        </div>
       </div>
 
+      {/* Spam Message Text */}
       <div>
-        <label htmlFor="submittedBy" className="block text-sm font-medium text-gray-300 mb-1">
-          Your name or email <span className="text-gray-500">(optional)</span>
+        <label htmlFor="message" className="sentinel-label block mb-3">
+          Spam Message Text
         </label>
-        <input
-          id="submittedBy"
-          type="text"
-          value={submittedBy}
-          onChange={(e) => setSubmittedBy(e.target.value)}
-          placeholder="So we can follow up if needed"
-          className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-        />
+        <div className="flex gap-3">
+          <span className="material-symbols-outlined text-on-surface-variant text-xl mt-1">chat_bubble</span>
+          <textarea
+            id="message"
+            value={messageText}
+            onChange={(e) => setMessageText(e.target.value)}
+            rows={5}
+            required
+            placeholder="Paste the full spam message here..."
+            className="stealth-input resize-y"
+          />
+        </div>
       </div>
 
+      {/* Link/URL */}
+      <div>
+        <label htmlFor="linkUrl" className="sentinel-label block mb-3">
+          Link / URL <span className="text-on-surface-variant/50 normal-case tracking-normal">(optional)</span>
+        </label>
+        <div className="flex items-center gap-3">
+          <span className="material-symbols-outlined text-on-surface-variant text-xl">link</span>
+          <input
+            id="linkUrl"
+            type="url"
+            value={linkUrl}
+            onChange={(e) => setLinkUrl(e.target.value)}
+            placeholder="https://suspicious-link.com"
+            className="stealth-input"
+          />
+        </div>
+      </div>
+
+      {/* Submit button */}
       <button
         type="submit"
         disabled={status === 'submitting' || !messageText.trim()}
-        className="w-full py-3 px-4 bg-cyan-600 hover:bg-cyan-500 disabled:bg-gray-700 disabled:text-gray-500 text-white font-semibold rounded-lg transition-colors"
+        className="btn-primary w-full flex items-center justify-center gap-2 text-base"
       >
-        {status === 'submitting' ? 'Submitting...' : 'Report Spam'}
+        <span className="material-symbols-outlined text-xl">send</span>
+        {status === 'submitting' ? 'Submitting...' : 'Submit Security Report'}
       </button>
 
       {status === 'success' && (
-        <p className="text-green-400 text-sm text-center">Thanks! Your report has been submitted for review.</p>
+        <div className="flex items-center justify-center gap-2 text-primary text-sm">
+          <span className="material-symbols-outlined text-lg">check_circle</span>
+          Report submitted successfully. Thank you for keeping the community safe.
+        </div>
       )}
       {status === 'error' && (
-        <p className="text-red-400 text-sm text-center">Something went wrong. Please try again.</p>
+        <div className="flex items-center justify-center gap-2 text-tertiary text-sm">
+          <span className="material-symbols-outlined text-lg">error</span>
+          Something went wrong. Please try again.
+        </div>
       )}
     </form>
   );
