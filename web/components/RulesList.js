@@ -100,6 +100,7 @@ export default function RulesList({ refreshKey }) {
           </div>
           <button
             onClick={() => setAiEnabled(!aiEnabled)}
+            aria-label="Toggle AI Fallback"
             className={`toggle-switch ${aiEnabled ? 'active' : ''}`}
           />
         </div>
@@ -113,6 +114,7 @@ export default function RulesList({ refreshKey }) {
           </div>
           <button
             onClick={() => setUnicodeNorm(!unicodeNorm)}
+            aria-label="Toggle Unicode Normalization"
             className={`toggle-switch ${unicodeNorm ? 'active' : ''}`}
           />
         </div>

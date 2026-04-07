@@ -48,7 +48,7 @@ export default function SubmissionList({ onAddRule, refreshKey }) {
           <button className="p-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all">
             <span className="material-symbols-outlined text-xl">filter_list</span>
           </button>
-          <div className="flex gap-1 bg-surface-container-low rounded-lg p-1">
+          <div className="flex gap-1 bg-surface-container-low rounded-lg p-1 overflow-x-auto">
             {['pending', 'approved', 'dismissed', 'all'].map((f) => (
               <button
                 key={f}
