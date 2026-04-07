@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 
 const STATUS_COLORS = {
   pending: 'bg-yellow-900/50 text-yellow-400 border-yellow-800',
@@ -16,17 +15,9 @@ export default function SubmissionList({ onAddRule }) {
   const [loading, setLoading] = useState(true);
 
   async function fetchSubmissions() {
-    let query = supabase
-      .from('submissions')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (filter !== 'all') {
-      query = query.eq('status', filter);
-    }
-
-    const { data, error } = await query;
-    if (!error) setSubmissions(data || []);
+    const res = await fetch(`/api/submissions?status=${filter}`);
+    const data = await res.json();
+    if (Array.isArray(data)) setSubmissions(data);
     setLoading(false);
   }
 
@@ -35,10 +26,11 @@ export default function SubmissionList({ onAddRule }) {
   }, [filter]);
 
   async function dismiss(id) {
-    await supabase
-      .from('submissions')
-      .update({ status: 'dismissed', reviewed_at: new Date().toISOString() })
-      .eq('id', id);
+    await fetch('/api/submissions', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status: 'dismissed' }),
+    });
     fetchSubmissions();
   }
 

@@ -1,25 +1,27 @@
 'use client';
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
 
 export default function SubmissionForm() {
   const [messageText, setMessageText] = useState('');
   const [submittedBy, setSubmittedBy] = useState('');
-  const [status, setStatus] = useState('idle'); // idle, submitting, success, error
+  const [status, setStatus] = useState('idle');
 
   async function handleSubmit(e) {
     e.preventDefault();
     if (!messageText.trim()) return;
 
     setStatus('submitting');
-    const { error } = await supabase.from('submissions').insert({
-      message_text: messageText.trim(),
-      submitted_by: submittedBy.trim() || null,
+    const res = await fetch('/api/submissions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message_text: messageText.trim(),
+        submitted_by: submittedBy.trim() || null,
+      }),
     });
 
-    if (error) {
-      console.error('Submission failed:', error);
+    if (!res.ok) {
       setStatus('error');
     } else {
       setStatus('success');

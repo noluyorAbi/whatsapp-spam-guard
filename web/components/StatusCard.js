@@ -1,24 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 
 export default function StatusCard() {
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchStatus() {
-    const { data, error } = await supabase
-      .from('bot_status')
-      .select('*')
-      .eq('id', 1)
-      .single();
-
-    if (error) {
-      setStatus(null);
-    } else {
-      setStatus(data);
-    }
+    const res = await fetch('/api/status');
+    const data = await res.json();
+    setStatus(data);
     setLoading(false);
   }
 

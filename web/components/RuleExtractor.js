@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 import { extractDomains, extractKeywords } from '@/lib/extract-rules';
 
 const CATEGORIES = ['trading', 'adult', 'gambling', 'academic', 'other'];
@@ -66,13 +65,18 @@ export default function RuleExtractor({ submission, onClose, onDone }) {
     }
 
     if (rules.length > 0) {
-      await supabase.from('custom_rules').insert(rules);
+      await fetch('/api/rules', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rules }),
+      });
     }
 
-    await supabase
-      .from('submissions')
-      .update({ status: 'approved', reviewed_at: new Date().toISOString() })
-      .eq('id', submission.id);
+    await fetch('/api/submissions', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: submission.id, status: 'approved' }),
+    });
 
     setSaving(false);
     onDone();

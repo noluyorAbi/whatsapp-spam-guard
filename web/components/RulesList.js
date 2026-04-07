@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 
 const CATEGORY_COLORS = {
   trading: 'text-yellow-400',
@@ -16,12 +15,9 @@ export default function RulesList({ refreshKey }) {
   const [loading, setLoading] = useState(true);
 
   async function fetchRules() {
-    const { data, error } = await supabase
-      .from('custom_rules')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (!error) setRules(data || []);
+    const res = await fetch('/api/rules');
+    const data = await res.json();
+    if (Array.isArray(data)) setRules(data);
     setLoading(false);
   }
 
@@ -30,7 +26,11 @@ export default function RulesList({ refreshKey }) {
   }, [refreshKey]);
 
   async function deleteRule(id) {
-    await supabase.from('custom_rules').delete().eq('id', id);
+    await fetch('/api/rules', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    });
     fetchRules();
   }
 

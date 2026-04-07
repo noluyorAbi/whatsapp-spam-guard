@@ -6,20 +6,26 @@ import SubmissionList from '@/components/SubmissionList';
 import RuleExtractor from '@/components/RuleExtractor';
 import RulesList from '@/components/RulesList';
 
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
-
 export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [extractSub, setExtractSub] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  function handleLogin(e) {
+  async function handleLogin(e) {
     e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
+    setLoading(true);
+    setError(false);
+    const res = await fetch('/api/admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password }),
+    });
+    setLoading(false);
+    if (res.ok) {
       setAuthed(true);
-      setError(false);
     } else {
       setError(true);
     }
