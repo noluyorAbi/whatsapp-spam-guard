@@ -1,4 +1,7 @@
 import SubmissionForm from '@/components/SubmissionForm';
+import StatsShowcase from '@/components/StatsShowcase';
+import RulesShowcase from '@/components/RulesShowcase';
+import Footer from '@/components/Footer';
 
 export default function Home() {
   return (
@@ -58,14 +61,14 @@ export default function Home() {
         </div>
       </main>
 
+      {/* Threat Intelligence Feed */}
+      <StatsShowcase />
+
+      {/* Detection Arsenal */}
+      <RulesShowcase />
+
       {/* Footer */}
-      <footer className="relative z-10 text-center py-8 text-on-surface-variant text-xs">
-        <div className="flex items-center justify-center gap-1.5 mb-2">
-          <span className="material-symbols-outlined text-sm">security</span>
-          <span className="font-headline font-semibold">Sentinel Protocol</span>
-        </div>
-        <p>Submissions are reviewed by an admin before any action is taken.</p>
-      </footer>
+      <Footer />
     </div>
   );
 }
