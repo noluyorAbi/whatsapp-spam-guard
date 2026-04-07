@@ -53,9 +53,21 @@ client.on('ready', () => {
   startPolling();
 });
 
-client.on('disconnected', (reason) => {
-  log.disconnected(reason);
+client.on('auth_failure', (msg) => {
+  log.error('Auth failed', msg);
   sendHeartbeat('disconnected');
+});
+
+client.on('disconnected', async (reason) => {
+  log.disconnected(reason);
+  stopHeartbeat();
+  sendHeartbeat('disconnected');
+
+  // Auto-reconnect after 5 seconds
+  console.log('[bot] Reconnecting in 5 seconds...');
+  setTimeout(() => {
+    client.initialize();
+  }, 5000);
 });
 
 process.on('SIGINT', () => {
