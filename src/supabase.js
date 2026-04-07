@@ -80,6 +80,24 @@ function stopHeartbeat() {
   if (supabase) sendHeartbeat('disconnected');
 }
 
+// --- Spam Event Logging ---
+
+async function logSpamEvent({ groupId, groupName, senderId, messageText, matchedRule, wasAiClassified }) {
+  if (!supabase) return;
+  try {
+    await supabase.from('uni-wa-bot-spam_log').insert({
+      group_id: groupId || null,
+      group_name: groupName || null,
+      sender_id: senderId || null,
+      message_text: messageText?.substring(0, 500) || '',
+      matched_rule: matchedRule || null,
+      was_ai_classified: wasAiClassified || false,
+    });
+  } catch (err) {
+    console.warn('[supabase] Failed to log spam event:', err.message);
+  }
+}
+
 // --- Custom Rules Polling ---
 
 let customDomains = [];
@@ -142,6 +160,7 @@ module.exports = {
   clearQrCode,
   incrementProcessed,
   incrementBlocked,
+  logSpamEvent,
   startPolling,
   stopPolling,
   getCustomDomains,

@@ -19,6 +19,7 @@ const {
   stopPolling,
   incrementProcessed,
   incrementBlocked,
+  logSpamEvent,
 } = require('./supabase');
 
 const config = loadConfig();
@@ -92,6 +93,13 @@ client.on('message', async (msg) => {
       log.verdictSpam(ruleResult);
       incrementBlocked();
       await handleSpam(msg, ruleResult.reason, botId);
+      logSpamEvent({
+        groupId: msg.from,
+        senderId: msg.author,
+        messageText: msg.body,
+        matchedRule: ruleResult.reason,
+        wasAiClassified: false,
+      });
       return;
     }
 
@@ -111,6 +119,13 @@ client.on('message', async (msg) => {
     if (aiResult.spam) {
       incrementBlocked();
       await handleSpam(msg, `AI: ${aiResult.reason}`, botId);
+      logSpamEvent({
+        groupId: msg.from,
+        senderId: msg.author,
+        messageText: msg.body,
+        matchedRule: aiResult.reason,
+        wasAiClassified: true,
+      });
     }
   } catch (err) {
     log.error('Error processing message', err);

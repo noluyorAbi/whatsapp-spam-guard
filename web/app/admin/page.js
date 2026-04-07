@@ -5,6 +5,7 @@ import StatusCard from '@/components/StatusCard';
 import SubmissionList from '@/components/SubmissionList';
 import RuleExtractor from '@/components/RuleExtractor';
 import RulesList from '@/components/RulesList';
+import ActivityFeed from '@/components/ActivityFeed';
 
 const NAV_ITEMS = [
   { key: 'overview', label: 'Overview', icon: 'dashboard' },
@@ -204,6 +205,12 @@ export default function AdminPage() {
         <main className="flex-1 overflow-y-auto p-6">
           {(activeTab === 'overview' || activeTab === 'stats') && (
             <StatusCard />
+          )}
+
+          {(activeTab === 'overview' || activeTab === 'stats') && (
+            <div className="mt-6">
+              <ActivityFeed />
+            </div>
           )}
 
           {(activeTab === 'overview' || activeTab === 'submissions') && (

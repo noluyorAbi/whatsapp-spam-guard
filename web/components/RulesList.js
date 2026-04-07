@@ -1,6 +1,38 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+
+function PatternCell({ value }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClickOutside(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [open]);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="font-data text-on-surface text-sm truncate max-w-full text-left hover:text-primary transition-colors underline decoration-dotted underline-offset-2"
+        title="Click to see full pattern"
+      >
+        {value}
+      </button>
+      {open && (
+        <div className="absolute z-50 left-0 top-full mt-1 w-80 p-3 rounded-xl bg-surface-container-highest border border-surface-container-highest/60 shadow-xl">
+          <p className="text-[10px] uppercase tracking-wider text-on-surface-variant mb-2">Full Pattern</p>
+          <pre className="font-data text-xs text-primary break-all whitespace-pre-wrap">{value}</pre>
+        </div>
+      )}
+    </div>
+  );
+}
 
 const CATEGORY_CHIPS = {
   trading: 'bg-secondary/10 text-secondary',
@@ -100,9 +132,10 @@ export default function RulesList({ refreshKey }) {
         <div className="overflow-hidden rounded-xl">
           {/* Table header */}
           <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-surface-container-high/50">
-            <span className="col-span-5 sentinel-label">Pattern</span>
+            <span className="col-span-4 sentinel-label">Pattern</span>
             <span className="col-span-2 sentinel-label">Category</span>
-            <span className="col-span-2 sentinel-label">Action</span>
+            <span className="col-span-2 sentinel-label">Source</span>
+            <span className="col-span-1 sentinel-label">Action</span>
             <span className="col-span-2 sentinel-label">Date Added</span>
             <span className="col-span-1 sentinel-label text-right">Actions</span>
           </div>
@@ -114,15 +147,17 @@ export default function RulesList({ refreshKey }) {
                 key={rule.id}
                 className="grid grid-cols-12 gap-4 items-center px-4 py-3 hover:bg-surface-container-high/30 transition-colors group"
               >
-                <div className="col-span-5 flex items-center gap-2 min-w-0">
-                  <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                <div className="col-span-4 flex items-center gap-2 min-w-0">
+                  <span className={`shrink-0 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
                     rule.type === 'domain'
                       ? 'bg-secondary/10 text-secondary'
                       : 'bg-primary/10 text-primary'
                   }`}>
                     {rule.type}
                   </span>
-                  <span className="font-data text-on-surface text-sm truncate">{rule.value}</span>
+                  <div className="min-w-0 flex-1">
+                    <PatternCell value={rule.value} />
+                  </div>
                 </div>
                 <div className="col-span-2">
                   <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
@@ -132,6 +167,19 @@ export default function RulesList({ refreshKey }) {
                   </span>
                 </div>
                 <div className="col-span-2">
+                  {rule.source_submission_id ? (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-medium text-secondary">
+                      <span className="material-symbols-outlined text-[12px]">inbox</span>
+                      From submission
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-medium text-on-surface-variant">
+                      <span className="material-symbols-outlined text-[12px]">edit</span>
+                      Manual
+                    </span>
+                  )}
+                </div>
+                <div className="col-span-1">
                   <span className="text-on-surface-variant text-sm">Block</span>
                 </div>
                 <div className="col-span-2">
