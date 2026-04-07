@@ -23,8 +23,32 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: 'Sentinel Protocol — WhatsApp Spam Guard',
-  description: 'Report and manage spam in university WhatsApp groups',
+  title: {
+    default: 'Sentinel Protocol — WhatsApp Spam Guard',
+    template: '%s | Sentinel Protocol',
+  },
+  description: 'Autonomous spam detection for university WhatsApp groups. Detects trading, adult, gambling & academic fraud spam using AI. Community-powered reporting and admin panel.',
+  keywords: ['whatsapp', 'spam detection', 'university', 'bot', 'moderation', 'anti-spam', 'sentinel protocol'],
+  authors: [{ name: 'Alperen Adatepe' }],
+  creator: 'Alperen Adatepe',
+  metadataBase: new URL('https://whatsapp-spam-guard.vercel.app'),
+  openGraph: {
+    title: 'Sentinel Protocol — WhatsApp Spam Guard',
+    description: 'Autonomous spam detection for university WhatsApp groups. AI-powered moderation with community reporting.',
+    url: 'https://whatsapp-spam-guard.vercel.app',
+    siteName: 'Sentinel Protocol',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Sentinel Protocol — WhatsApp Spam Guard',
+    description: 'Autonomous spam detection for university WhatsApp groups.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({ children }) {
