@@ -7,8 +7,22 @@ const { shouldAnalyze, extractLinks } = require('./filter');
 const { checkRules } = require('./rules');
 const { classify } = require('./classifier');
 const { handleSpam } = require('./actions');
+const log = require('./logger');
+const {
+  initSupabase,
+  startHeartbeat,
+  stopHeartbeat,
+  sendHeartbeat,
+  startPolling,
+  stopPolling,
+  incrementProcessed,
+  incrementBlocked,
+} = require('./supabase');
 
 const config = loadConfig();
+
+// Init Supabase
+initSupabase(config);
 
 const client = new Client({
   authStrategy: new LocalAuth(),
@@ -20,54 +34,71 @@ const client = new Client({
 
 let botId = null;
 
+log.init();
+log.connecting();
+
 client.on('qr', (qr) => {
-  console.log('[bot] Scan this QR code with WhatsApp:');
+  log.qr();
   qrcode.generate(qr, { small: true });
 });
 
 client.on('ready', () => {
   botId = client.info.wid._serialized;
-  console.log(`[bot] Connected as ${botId}`);
-  console.log('[bot] Monitoring group messages for spam...');
+  log.ready(botId);
+  startHeartbeat();
+  startPolling();
 });
 
 client.on('disconnected', (reason) => {
-  console.warn('[bot] Disconnected:', reason);
+  log.disconnected(reason);
+  sendHeartbeat('disconnected');
 });
 
-client.on('message_create', async (msg) => {
+process.on('SIGINT', () => {
+  stopHeartbeat();
+  stopPolling();
+  process.exit(0);
+});
+
+client.on('message', async (msg) => {
   try {
     if (!shouldAnalyze(msg)) return;
 
     const links = extractLinks(msg.body);
+    log.messageReceived(msg.from, msg.body);
+    log.analyzing(links);
+
+    incrementProcessed();
+
     const ruleResult = checkRules(msg.body, links);
 
-    if (config.logLevel === 'debug') {
-      console.log(`[bot] Analyzed message in ${msg.from}: ${ruleResult.verdict} — ${ruleResult.reason}`);
-    }
-
     if (ruleResult.verdict === 'spam') {
+      log.verdictSpam(ruleResult);
+      incrementBlocked();
       await handleSpam(msg, ruleResult.reason, botId);
       return;
     }
 
-    if (ruleResult.verdict === 'clean') return;
-
-    // Uncertain — escalate to AI
-    console.log(`[bot] Escalating to AI: "${msg.body.substring(0, 80)}..."`);
-    const aiResult = await classify(config, msg.body);
-
-    if (config.logLevel === 'debug') {
-      console.log(`[bot] AI result: spam=${aiResult.spam}, reason=${aiResult.reason}`);
+    if (ruleResult.verdict === 'clean') {
+      if (config.logLevel === 'debug') {
+        log.verdictCleanDebug(ruleResult.reason);
+      }
+      return;
     }
 
+    // Uncertain — escalate to AI
+    log.verdictUncertain(ruleResult.reason);
+    log.aiEscalating(msg.body);
+    const aiResult = await classify(config, msg.body);
+    log.aiResult(aiResult.spam, aiResult.reason);
+
     if (aiResult.spam) {
+      incrementBlocked();
       await handleSpam(msg, `AI: ${aiResult.reason}`, botId);
     }
   } catch (err) {
-    console.error('[bot] Error processing message:', err);
+    log.error('Error processing message', err);
   }
 });
 
-console.log('[bot] Initializing WhatsApp client...');
 client.initialize();
