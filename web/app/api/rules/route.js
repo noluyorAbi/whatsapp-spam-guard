@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 // GET — list custom rules
 export async function GET() {
   const { data, error } = await supabase
-    .from('custom_rules')
+    .from('uni-wa-bot-custom_rules')
     .select('*')
     .order('created_at', { ascending: false });
 
@@ -23,7 +23,7 @@ export async function POST(req) {
     return NextResponse.json({ error: 'rules required' }, { status: 400 });
   }
 
-  const { error } = await supabase.from('custom_rules').insert(rules);
+  const { error } = await supabase.from('uni-wa-bot-custom_rules').insert(rules);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -36,7 +36,7 @@ export async function POST(req) {
 export async function DELETE(req) {
   const { id } = await req.json();
 
-  const { error } = await supabase.from('custom_rules').delete().eq('id', id);
+  const { error } = await supabase.from('uni-wa-bot-custom_rules').delete().eq('id', id);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

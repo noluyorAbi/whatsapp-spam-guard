@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   const { data, error } = await supabase
-    .from('bot_status')
+    .from('uni-wa-bot-bot_status')
     .select('*')
     .eq('id', 1)
     .single();

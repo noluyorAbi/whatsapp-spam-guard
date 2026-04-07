@@ -9,7 +9,7 @@ export async function POST(req) {
     return NextResponse.json({ error: 'message_text required' }, { status: 400 });
   }
 
-  const { error } = await supabase.from('submissions').insert({
+  const { error } = await supabase.from('uni-wa-bot-submissions').insert({
     message_text: message_text.trim(),
     submitted_by: submitted_by?.trim() || null,
   });
@@ -27,7 +27,7 @@ export async function GET(req) {
   const filter = searchParams.get('status') || 'pending';
 
   let query = supabase
-    .from('submissions')
+    .from('uni-wa-bot-submissions')
     .select('*')
     .order('created_at', { ascending: false });
 
@@ -49,7 +49,7 @@ export async function PATCH(req) {
   const { id, status } = await req.json();
 
   const { error } = await supabase
-    .from('submissions')
+    .from('uni-wa-bot-submissions')
     .update({ status, reviewed_at: new Date().toISOString() })
     .eq('id', id);
 

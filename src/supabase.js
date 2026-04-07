@@ -4,9 +4,11 @@ let supabase = null;
 
 function initSupabase(config) {
   if (!config.supabaseUrl || !config.supabaseAnonKey) {
+    console.warn('[supabase] Missing URL or key, Supabase disabled');
     return null;
   }
   supabase = createClient(config.supabaseUrl, config.supabaseAnonKey);
+  console.log('[supabase] Initialized with', config.supabaseUrl);
   return supabase;
 }
 
@@ -32,7 +34,10 @@ function incrementBlocked() {
 }
 
 async function sendHeartbeat(status, qrCode) {
-  if (!supabase) return;
+  if (!supabase) {
+    console.warn('[supabase] Not initialized, skipping heartbeat');
+    return;
+  }
   try {
     const row = {
       id: 1,
@@ -45,7 +50,10 @@ async function sendHeartbeat(status, qrCode) {
     if (qrCode !== undefined) {
       row.qr_code = qrCode;
     }
-    await supabase.from('bot_status').upsert(row);
+    const { error } = await supabase.from('uni-wa-bot-bot_status').upsert(row);
+    if (error) {
+      console.warn('[supabase] Heartbeat error:', error.message);
+    }
   } catch (err) {
     console.warn('[supabase] Heartbeat failed:', err.message);
   }
@@ -80,7 +88,7 @@ let customKeywords = [];
 async function pollCustomRules() {
   if (!supabase) return;
   try {
-    const { data, error } = await supabase.from('custom_rules').select('*');
+    const { data, error } = await supabase.from('uni-wa-bot-custom_rules').select('*');
     if (error) throw error;
 
     customDomains = data
