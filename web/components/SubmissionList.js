@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { WhatsAppText } from '@/lib/whatsapp-format';
 
 const PRIORITY_MAP = {
   pending: { label: 'Analysis Pending', color: 'bg-secondary/10 text-secondary' },
@@ -125,9 +126,9 @@ export default function SubmissionList({ onAddRule, refreshKey }) {
 
                   {isActive && (
                     <div className="px-4 pb-4">
-                      <pre className="text-on-surface text-sm whitespace-pre-wrap p-4 bg-surface-container-low rounded-xl max-h-64 overflow-y-auto font-data text-xs leading-relaxed">
-                        {sub.message_text}
-                      </pre>
+                      <div className="text-on-surface text-sm whitespace-pre-wrap p-4 bg-surface-container-low rounded-xl max-h-64 overflow-y-auto leading-relaxed">
+                        <WhatsAppText text={sub.message_text} />
+                      </div>
 
                       {sub.status === 'pending' && (
                         <div className="flex gap-2 mt-4">

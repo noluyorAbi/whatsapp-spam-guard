@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { WhatsAppText } from '@/lib/whatsapp-format';
 
 function formatTimestamp(iso) {
   const d = new Date(iso);
@@ -74,7 +75,9 @@ function SpamRow({ entry, onStatusChange, isExpanded, onToggle }) {
             )}
           </div>
 
-          <p className="text-on-surface text-sm mb-1">{truncate(entry.message_text, 80)}</p>
+          <p className="text-on-surface text-sm mb-1">
+          <WhatsAppText text={truncate(entry.message_text, 80)} />
+        </p>
 
           <div className="flex items-center gap-3 flex-wrap text-[11px] text-on-surface-variant">
             {entry.sender_id && (
@@ -103,9 +106,9 @@ function SpamRow({ entry, onStatusChange, isExpanded, onToggle }) {
           {/* Full message */}
           <div>
             <label className="sentinel-label block mb-2">Full Message</label>
-            <pre className="text-on-surface text-sm whitespace-pre-wrap p-4 bg-surface-container-low rounded-xl max-h-48 overflow-y-auto font-data text-xs leading-relaxed border-l-2 border-danger/50">
-              {entry.message_text}
-            </pre>
+            <div className="text-on-surface text-sm whitespace-pre-wrap p-4 bg-surface-container-low rounded-xl max-h-48 overflow-y-auto leading-relaxed border-l-2 border-danger/50">
+              <WhatsAppText text={entry.message_text} />
+            </div>
           </div>
 
           {/* Details grid */}
@@ -130,12 +133,22 @@ function SpamRow({ entry, onStatusChange, isExpanded, onToggle }) {
 
           {/* Review note (if already reviewed) */}
           {entry.reviewed_at && (
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-container-low text-xs">
-              <span className="material-symbols-outlined text-sm text-on-surface-variant">rate_review</span>
-              <span className="text-on-surface-variant">
-                Reviewed {formatTimestamp(entry.reviewed_at)}
-                {entry.review_note && `: "${entry.review_note}"`}
-              </span>
+            <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-surface-container-low text-xs">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-sm text-on-surface-variant">rate_review</span>
+                <span className="text-on-surface-variant">
+                  Reviewed {formatTimestamp(entry.reviewed_at)}
+                  {entry.review_note && `: "${entry.review_note}"`}
+                </span>
+              </div>
+              <button
+                onClick={() => handleStatusChange('blocked')}
+                disabled={updating}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-secondary/10 transition-all text-[11px] font-medium"
+              >
+                <span className="material-symbols-outlined text-sm">undo</span>
+                {updating ? 'Resetting...' : 'Undo Review'}
+              </button>
             </div>
           )}
 
