@@ -102,57 +102,89 @@ function SpamRow({ entry, onStatusChange, isExpanded, onToggle }) {
 
       {/* Expanded detail view */}
       {isExpanded && (
-        <div className="px-4 pb-4 space-y-4">
-          {/* Full message */}
+        <div className="px-4 pb-5 space-y-4">
+          {/* Full message — WhatsApp chat bubble style */}
           <div>
-            <label className="sentinel-label block mb-2">Full Message</label>
-            <div className="text-on-surface text-sm whitespace-pre-wrap p-4 bg-surface-container-low rounded-xl max-h-48 overflow-y-auto leading-relaxed border-l-2 border-danger/50">
-              <WhatsAppText text={entry.message_text} />
+            <label className="sentinel-label block mb-2">Intercepted Message</label>
+            <div className="relative bg-surface-container rounded-2xl rounded-tl-sm p-5 max-h-56 overflow-y-auto">
+              <div className="absolute top-0 left-0 w-1 h-full bg-danger/60 rounded-l-sm" />
+              <div className="text-on-surface text-[13px] whitespace-pre-wrap leading-relaxed pl-3">
+                <WhatsAppText text={entry.message_text} />
+              </div>
             </div>
           </div>
 
-          {/* Details grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="bg-surface-container-low rounded-lg p-3">
-              <span className="sentinel-label block mb-1">Matched Rule</span>
-              <p className="font-data text-on-surface text-xs">{entry.matched_rule || '—'}</p>
+          {/* Metadata — horizontal chips instead of grid boxes */}
+          <div className="flex flex-wrap gap-2">
+            {/* Matched rule */}
+            {entry.matched_rule && (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container text-xs">
+                <span className="material-symbols-outlined text-danger text-sm">gavel</span>
+                <span className="text-on-surface-variant">Rule:</span>
+                <span className="font-data text-on-surface text-[11px]">{entry.matched_rule}</span>
+              </div>
+            )}
+
+            {/* Detection method */}
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container text-xs">
+              <span className={`material-symbols-outlined text-sm ${entry.was_ai_classified ? 'text-primary' : 'text-secondary'}`}>
+                {entry.was_ai_classified ? 'psychology' : 'rule'}
+              </span>
+              <span className="text-on-surface">{entry.was_ai_classified ? 'AI Classifier' : 'Rule Engine'}</span>
             </div>
-            <div className="bg-surface-container-low rounded-lg p-3">
-              <span className="sentinel-label block mb-1">Detection</span>
-              <p className="text-on-surface text-xs font-medium">{entry.was_ai_classified ? 'AI Classifier' : 'Rule Engine'}</p>
-            </div>
-            <div className="bg-surface-container-low rounded-lg p-3">
-              <span className="sentinel-label block mb-1">Sender ID</span>
-              <p className="font-data text-on-surface text-xs break-all">{entry.sender_id || '—'}</p>
-            </div>
-            <div className="bg-surface-container-low rounded-lg p-3">
-              <span className="sentinel-label block mb-1">Group</span>
-              <p className="font-data text-on-surface text-xs break-all">{entry.group_name || entry.group_id || '—'}</p>
+
+            {/* Sender */}
+            {entry.sender_id && (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container text-xs">
+                <span className="material-symbols-outlined text-on-surface-variant text-sm">person</span>
+                <span className="font-data text-on-surface text-[11px]">{entry.sender_id}</span>
+              </div>
+            )}
+
+            {/* Group */}
+            {(entry.group_name || entry.group_id) && (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container text-xs">
+                <span className="material-symbols-outlined text-on-surface-variant text-sm">group</span>
+                <span className="font-data text-on-surface text-[11px]">{entry.group_name || entry.group_id}</span>
+              </div>
+            )}
+
+            {/* Action taken */}
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-danger/8 text-xs">
+              <span className="material-symbols-outlined text-danger text-sm">delete_sweep</span>
+              <span className="text-danger font-medium">Deleted &amp; Kicked</span>
             </div>
           </div>
 
-          {/* Review note (if already reviewed) */}
+          {/* Review status */}
           {entry.reviewed_at && (
-            <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-surface-container-low text-xs">
+            <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-surface-container">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-sm text-on-surface-variant">rate_review</span>
-                <span className="text-on-surface-variant">
-                  Reviewed {formatTimestamp(entry.reviewed_at)}
-                  {entry.review_note && `: "${entry.review_note}"`}
+                <span className={`material-symbols-outlined text-base ${
+                  entry.status === 'confirmed' ? 'text-primary' : 'text-secondary'
+                }`}>
+                  {entry.status === 'confirmed' ? 'verified' : 'flag'}
+                </span>
+                <span className="text-on-surface text-xs font-medium">
+                  {entry.status === 'confirmed' ? 'Confirmed as spam' : 'Marked as not spam'}
+                </span>
+                <span className="text-on-surface-variant text-[11px]">
+                  · {formatTimestamp(entry.reviewed_at)}
+                  {entry.review_note && <span className="italic"> — &ldquo;{entry.review_note}&rdquo;</span>}
                 </span>
               </div>
               <button
                 onClick={() => handleStatusChange('blocked')}
                 disabled={updating}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-secondary/10 transition-all text-[11px] font-medium"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-secondary/10 transition-all text-xs font-medium"
               >
-                <span className="material-symbols-outlined text-sm">undo</span>
-                {updating ? 'Resetting...' : 'Undo Review'}
+                <span className="material-symbols-outlined text-base">undo</span>
+                {updating ? 'Resetting...' : 'Undo'}
               </button>
             </div>
           )}
 
-          {/* Actions */}
+          {/* Actions for unreviewed */}
           {entry.status === 'blocked' && (
             <div className="space-y-3">
               <div>
@@ -165,19 +197,19 @@ function SpamRow({ entry, onStatusChange, isExpanded, onToggle }) {
                   className="stealth-input text-sm"
                 />
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 <button
                   onClick={() => handleStatusChange('false_positive')}
                   disabled={updating}
-                  className="btn-ghost text-sm py-2 px-4 flex items-center gap-2"
+                  className="btn-ghost text-sm py-2.5 px-5 flex items-center gap-2"
                 >
-                  <span className="material-symbols-outlined text-lg text-secondary">undo</span>
-                  {updating ? 'Saving...' : 'Not Spam (False Positive)'}
+                  <span className="material-symbols-outlined text-lg text-secondary">flag</span>
+                  {updating ? 'Saving...' : 'Not Spam'}
                 </button>
                 <button
                   onClick={() => handleStatusChange('confirmed')}
                   disabled={updating}
-                  className="btn-primary text-sm py-2 px-4 flex items-center gap-2"
+                  className="btn-primary text-sm py-2.5 px-5 flex items-center gap-2"
                 >
                   <span className="material-symbols-outlined text-lg">verified</span>
                   {updating ? 'Saving...' : 'Confirm Spam'}

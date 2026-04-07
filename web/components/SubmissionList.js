@@ -35,6 +35,15 @@ export default function SubmissionList({ onAddRule, refreshKey }) {
     fetchSubmissions();
   }
 
+  async function resetToPending(id) {
+    await fetch('/api/submissions', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status: 'pending' }),
+    });
+    fetchSubmissions();
+  }
+
   return (
     <div className="bg-surface-container rounded-2xl overflow-hidden">
       {/* Header */}
@@ -145,6 +154,25 @@ export default function SubmissionList({ onAddRule, refreshKey }) {
                           >
                             <span className="material-symbols-outlined text-lg">close</span>
                             Dismiss
+                          </button>
+                        </div>
+                      )}
+
+                      {(sub.status === 'approved' || sub.status === 'dismissed') && (
+                        <div className="flex items-center justify-between mt-4 px-3 py-2 rounded-lg bg-surface-container-low">
+                          <span className="text-on-surface-variant text-xs flex items-center gap-1.5">
+                            <span className="material-symbols-outlined text-sm">
+                              {sub.status === 'approved' ? 'check_circle' : 'cancel'}
+                            </span>
+                            {sub.status === 'approved' ? 'Approved — rules extracted' : 'Dismissed'}
+                            {sub.reviewed_at && ` · ${new Date(sub.reviewed_at).toLocaleString()}`}
+                          </span>
+                          <button
+                            onClick={() => resetToPending(sub.id)}
+                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-secondary/10 transition-all text-[11px] font-medium"
+                          >
+                            <span className="material-symbols-outlined text-sm">undo</span>
+                            Undo
                           </button>
                         </div>
                       )}
